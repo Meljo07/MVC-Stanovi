@@ -1,0 +1,60 @@
+﻿@model List<MVC_Stanovi.Models.Stan>
+
+<div class="filteridiv">
+    <form method="get" action="/Home/Index">
+
+        <select name="tip">
+            <option value="">Ulica</option>
+            <option value="Avijatičarski trg">Avijatičarski trg</option>
+            <option value="Kej oslobođenja">Kej oslobođenja</option>
+            <option value="Karađorđev trg">Karađorđev trg</option>
+        </select>
+
+        <select name="kvad">
+            <option value="">Kvadratura</option>
+            <option value="45">45m²</option>
+            <option value="55">55m²</option>
+            <option value="65">65m²</option>
+            <option value="75">75m²</option>
+        </select>
+
+        <select name="cena">
+            <option value="">Cena</option>
+            <option value="1">100.000 € – 115.000 €</option>
+            <option value="2">115.000 € – 130.000 €</option>
+            <option value="3">130.000 € – 160.000 €</option>
+            <option value="4">160.000 € – 200.000 €</option>
+        </select>
+
+        <select name="vrsta">
+            <option value="">Vrsta stana</option>
+            <option value="smart">SmartStan</option>
+            <option value="obicni">ObicanStan</option>
+        </select>
+
+        <button type="submit">
+            🔍 Filter
+        </button>
+
+    </form>
+</div>
+
+<div class="userglavnidiv">
+
+    @foreach (var s in Model)
+    {
+        <div class="stan">
+            <img src="/slike/stan1.png" />
+
+            <p>
+                Lokacija: @s.ulica <br />
+                Površina: @s.kvadratura m² <br />
+                Cena: @s.cena € <br />
+                Vrsta: @s.vrsta <br />
+            </p>
+
+            <button>3D pregled mesta</button>
+        </div>
+    }
+
+</div>

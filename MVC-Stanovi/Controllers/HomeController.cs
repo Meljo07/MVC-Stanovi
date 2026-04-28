@@ -1,11 +1,16 @@
 using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using MVC_Stanovi.Models;
+using MySql.Data.MySqlClient;
+using Microsoft.AspNetCore.Http;
+using System;
 
 namespace MVC_Stanovi.Controllers
 {
     public class HomeController : Controller
     {
+        string connStr = "server=localhost;database=stanovi;user=root;password=;";
+
         private readonly ILogger<HomeController> _logger;
 
         public HomeController(ILogger<HomeController> logger)
@@ -13,20 +18,162 @@ namespace MVC_Stanovi.Controllers
             _logger = logger;
         }
 
-        public IActionResult Index()
+
+        public IActionResult Index(string tip, string kvad, string cena, string vrsta)
+        {
+            List<Stan> stanovi = new List<Stan>();
+
+            using (MySqlConnection conn = new MySqlConnection(connStr))
+            {
+                conn.Open();
+
+                string query = "SELECT * FROM stanovi WHERE 1=1";
+
+                if (!string.IsNullOrEmpty(tip))
+                    query += " AND ulica = @tip";
+
+                if (!string.IsNullOrEmpty(kvad))
+                    query += " AND kvadratura = @kvad";
+
+                if (!string.IsNullOrEmpty(vrsta))
+                    query += " AND vrsta = @vrsta";
+
+                if (!string.IsNullOrEmpty(cena))
+                {
+                    if (cena == "1")
+                        query += " AND cena BETWEEN 100000 AND 115000";
+                    else if (cena == "2")
+                        query += " AND cena BETWEEN 115000 AND 130000";
+                    else if (cena == "3")
+                        query += " AND cena BETWEEN 130000 AND 160000";
+                    else if (cena == "4")
+                        query += " AND cena BETWEEN 160000 AND 200000";
+                }
+
+                MySqlCommand cmd = new MySqlCommand(query, conn);
+
+                if (!string.IsNullOrEmpty(tip))
+                    cmd.Parameters.AddWithValue("@tip", tip);
+
+                if (!string.IsNullOrEmpty(kvad))
+                    cmd.Parameters.AddWithValue("@kvad", kvad);
+
+                if (!string.IsNullOrEmpty(vrsta))
+                    cmd.Parameters.AddWithValue("@vrsta", vrsta);
+
+                var reader = cmd.ExecuteReader();
+
+                while (reader.Read())
+                {
+                    stanovi.Add(new Stan
+                    {
+                        id = Convert.ToInt32(reader["id"]),
+                        naziv = reader["naziv"].ToString(),
+                        ulica = reader["ulica"].ToString(),
+                        kvadratura = reader["kvadratura"].ToString(),
+                        cena = Convert.ToInt32(reader["cena"]),
+                        vrsta = reader["vrsta"].ToString()
+                    });
+                }
+            }
+
+            return View(stanovi);
+        }
+
+        public IActionResult Login()
         {
             return View();
         }
 
-        public IActionResult Privacy()
+        public IActionResult Register()
         {
             return View();
         }
 
+     
+        [HttpPost]
+        public IActionResult Register(string username, string password)
+        {
+            using (MySqlConnection conn = new MySqlConnection(connStr))
+            {
+                conn.Open();
+
+                string query = "INSERT INTO users (username, password, role) VALUES (@u, @p, 'user')";
+                MySqlCommand cmd = new MySqlCommand(query, conn);
+                cmd.Parameters.AddWithValue("@u", username);
+                cmd.Parameters.AddWithValue("@p", password);
+
+                cmd.ExecuteNonQuery();
+            }
+
+            return RedirectToAction("Login");
+        }
+
+      
+        [HttpPost]
+        public IActionResult Login(string username, string password)
+        {
+            using (MySqlConnection conn = new MySqlConnection(connStr))
+            {
+                conn.Open();
+
+                string query = "SELECT * FROM users WHERE username=@u AND password=@p";
+                MySqlCommand cmd = new MySqlCommand(query, conn);
+                cmd.Parameters.AddWithValue("@u", username);
+                cmd.Parameters.AddWithValue("@p", password);
+
+                var reader = cmd.ExecuteReader();
+
+                if (reader.Read())
+                {
+                    string role = reader["role"].ToString();
+
+                    HttpContext.Session.SetString("user", reader["username"].ToString());
+                    HttpContext.Session.SetString("role", role);
+
+                    if (role == "admin")
+                        return RedirectToAction("Admin");
+                    else
+                        return RedirectToAction("User");
+                }
+            }
+
+            ViewBag.Error = "Pogrešan login!";
+            return View();
+        }
+
+        public IActionResult User()
+        {
+            if (HttpContext.Session.GetString("user") == null)
+                return RedirectToAction("Login");
+
+            return View();
+        }
+
+       
+        public IActionResult Admin()
+        {
+            if (HttpContext.Session.GetString("role") != "admin")
+                return RedirectToAction("Login");
+
+            return View();
+        }
+
+        
+        public IActionResult Logout()
+        {
+            HttpContext.Session.Clear();
+            return RedirectToAction("Index");
+        }
+
+        
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+            return View(new ErrorViewModel
+            {
+                RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier
+            });
         }
     }
 }

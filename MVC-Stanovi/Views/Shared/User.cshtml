@@ -1,13 +1,10 @@
-﻿@model List<MVC_Stanovi.Models.Stan>
-
-<div class="filteridiv">
+﻿<div class="filteridiv">
     <form method="get" action="/Home/Index">
-
         <select name="tip">
             <option value="">Ulica</option>
-            <option value="Avijatičarski trg">Avijatičarski trg</option>
-            <option value="Kej oslobođenja">Kej oslobođenja</option>
-            <option value="Karađorđev trg">Karađorđev trg</option>
+            <option value="ulica1">Avijatičarski trg</option>
+            <option value="ulica2">Kej oslobođenja</option>
+            <option value="ulica3">Karađorđev trg</option>
         </select>
 
         <select name="kvad">
@@ -27,34 +24,118 @@
         </select>
 
         <select name="vrsta">
-            <option value="">Vrsta stana</option>
-            <option value="smart">SmartStan</option>
-            <option value="obicni">ObicanStan</option>
+            <option value="">Vrsta Stana</option>
+            <option value="smart">Smart Stan</option>
+            <option value="obicni">Običan Stan</option>
         </select>
 
         <button type="submit">
-            🔍 Filter
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
         </button>
-
     </form>
+    <a href="/Home/Index">Logout</a>
 </div>
 
 <div class="userglavnidiv">
-
-    @foreach (var s in Model)
-    {
+    <div class="iznaddiv">
         <div class="stan">
-            <img src="/slike/stan1.png" />
-
+            <img src="/slike/stan1.png" alt="Dnevna soba" />
             <p>
-                Lokacija: @s.ulica <br />
-                Površina: @s.kvadratura m² <br />
-                Cena: @s.cena € <br />
-                Vrsta: @s.vrsta <br />
+                Lokacija: Zemun Beograd <br />
+                Površina: 55m² <br />
+                Cena: 129.000 € <br />
+                Adresa: Kej oslobođenja 21
             </p>
-
-            <button>3D pregled mesta</button>
+            <button>3D pregled</button>
         </div>
-    }
+        <div class="stan">
+            <img src="/slike/stan2.png" alt="Dnevna soba" />
+            <p>
+                Lokacija: Zemun Beograd <br />
+                Površina: 45m² <br />
+                Cena: 112.000 € <br />
+                Adresa: Avijatičarski trg 3
+            </p>
+            <button>3D pregled</button>
+        </div>
+        <div class="stan">
+            <img src="/slike/stan3.png" alt="Dnevna soba" />
+            <p>
+                Lokacija: Zemun Beograd <br />
+                Površina: 65m² <br />
+                Cena: 145.000 € <br />
+                Adresa: Karađorđev trg 7
+            </p>
+            <button>3D pregled</button>
+        </div>
+    </div>
 
+    <div class="sredinadiv">
+        <div class="stan">
+            <img src="/slike/stan4.png" alt="Dnevna soba" />
+            <p>
+                Lokacija: Zemun Beograd <br />
+                Površina: 55m² <br />
+                Cena: 132.000 € <br />
+                Adresa: Avijatičarski trg 3
+            </p>
+            <button>3D pregled</button>
+        </div>
+        <div class="stan">
+            <img src="/slike/stan5.png" alt="Dnevna soba" />
+            <p>
+                Lokacija: Zemun Beograd <br />
+                Površina: 75m² <br />
+                Cena: 167.000 € <br />
+                Adresa: Kej oslobođenja 21
+            </p>
+            <button>3D pregled</button>
+        </div>
+        <div class="stan">
+            <img src="/slike/stan6.png" alt="Dnevna soba" />
+            <p>
+                Lokacija: Zemun Beograd <br />
+                Površina: 65m² <br />
+                Cena: 147.000 € <br />
+                Adresa: Karađorđev trg 7
+            </p>
+            <button>3D pregled</button>
+        </div>
+    </div>
+
+    <div class="ispoddiv">
+        <div class="stan">
+            <img src="/slike/stan7.png" alt="Dnevna soba" />
+            <p>
+                Lokacija: Zemun Beograd <br />
+                Površina: 45m² <br />
+                Cena: 100.000 € <br />
+                Adresa: Karađorđev trg 7
+            </p>
+            <button>3D pregled</button>
+        </div>
+        <div class="stan">
+            <img src="/slike/stan8.png" alt="Dnevna soba" />
+            <p>
+                Lokacija: Zemun Beograd <br />
+                Površina: 45m² <br />
+                Cena: 104.000 € <br />
+                Adresa: Avijatičarski trg 3
+            </p>
+            <button>3D pregled</button>
+        </div>
+        <div class="stan">
+            <img src="/slike/stan9.png" alt="Dnevna soba" />
+            <p>
+                Lokacija: Zemun Beograd <br />
+                Površina: 75m² <br />
+                Cena: 169.000 € <br />
+                Adresa: Kej oslobođenja 21
+            </p>
+            <button>3D pregled</button>
+        </div>
+    </div>
 </div>

@@ -9,7 +9,7 @@ namespace MVC_Stanovi.Controllers
 {
     public class HomeController : Controller
     {
-        string connStr = "server=localhost;database=stanovi;user=root;password=;";
+        string konekcija = "server=localhost;database=stanovi;user=root;password=;";
 
         private readonly ILogger<HomeController> _logger;
 
@@ -23,7 +23,7 @@ namespace MVC_Stanovi.Controllers
         {
             List<Stan> stanovi = new List<Stan>();
 
-            using (MySqlConnection conn = new MySqlConnection(connStr))
+            using (MySqlConnection conn = new MySqlConnection(konekcija))
             {
                 conn.Open();
 
@@ -33,7 +33,9 @@ namespace MVC_Stanovi.Controllers
                     query += " AND ulica = @tip";
 
                 if (!string.IsNullOrEmpty(kvad))
+                
                     query += " AND kvadratura = @kvad";
+                
 
                 if (!string.IsNullOrEmpty(vrsta))
                     query += " AND vrsta = @vrsta";
@@ -56,7 +58,9 @@ namespace MVC_Stanovi.Controllers
                     cmd.Parameters.AddWithValue("@tip", tip);
 
                 if (!string.IsNullOrEmpty(kvad))
-                    cmd.Parameters.AddWithValue("@kvad", kvad);
+                
+                    cmd.Parameters.AddWithValue("@kvad", Convert.ToInt32(kvad));
+                
 
                 if (!string.IsNullOrEmpty(vrsta))
                     cmd.Parameters.AddWithValue("@vrsta", vrsta);
@@ -70,7 +74,7 @@ namespace MVC_Stanovi.Controllers
                         id = Convert.ToInt32(reader["id"]),
                         naziv = reader["naziv"].ToString(),
                         ulica = reader["ulica"].ToString(),
-                        kvadratura = reader["kvadratura"].ToString(),
+                        kvadratura = Convert.ToInt32(reader["kvadratura"]),
                         cena = Convert.ToInt32(reader["cena"]),
                         vrsta = reader["vrsta"].ToString()
                     });
@@ -94,7 +98,7 @@ namespace MVC_Stanovi.Controllers
         [HttpPost]
         public IActionResult Register(string username, string password)
         {
-            using (MySqlConnection conn = new MySqlConnection(connStr))
+            using (MySqlConnection conn = new MySqlConnection(konekcija))
             {
                 conn.Open();
 
@@ -113,7 +117,7 @@ namespace MVC_Stanovi.Controllers
         [HttpPost]
         public IActionResult Login(string username, string password)
         {
-            using (MySqlConnection conn = new MySqlConnection(connStr))
+            using (MySqlConnection conn = new MySqlConnection(konekcija))
             {
                 conn.Open();
 
@@ -147,10 +151,37 @@ namespace MVC_Stanovi.Controllers
             if (HttpContext.Session.GetString("user") == null)
                 return RedirectToAction("Login");
 
-            return View();
+            List<Stan> stanovi = new List<Stan>();
+
+            using (MySqlConnection conn = new MySqlConnection(konekcija))
+            {
+                conn.Open();
+
+                string query = "SELECT * FROM stanovi";
+                MySqlCommand cmd = new MySqlCommand(query, conn);
+
+                var reader = cmd.ExecuteReader();
+
+                while (reader.Read())
+                {
+                    stanovi.Add(new Stan
+                    {
+                        id = Convert.ToInt32(reader["id"]),
+                        naziv = reader["naziv"].ToString(),
+                        ulica = reader["ulica"].ToString(),
+                        kvadratura = Convert.ToInt32(reader["kvadratura"]),
+                        cena = Convert.ToInt32(reader["cena"]),
+                        vrsta = reader["vrsta"].ToString()
+                    });
+                }
+
+                Console.WriteLine("BROJ STANOVA: " + stanovi.Count);
+            }
+
+            return View(stanovi);
         }
 
-       
+
         public IActionResult Admin()
         {
             if (HttpContext.Session.GetString("role") != "admin")

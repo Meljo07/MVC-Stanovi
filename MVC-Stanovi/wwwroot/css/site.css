@@ -158,6 +158,16 @@ select {
     box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
     transform: translateY(-2px);
 }
+#velikiDiv {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.stan {
+    border: 1px solid black;
+    padding: 10px;
+}
 #druhilog {
     margin-left: 125px;
 }

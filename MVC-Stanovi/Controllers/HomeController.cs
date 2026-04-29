@@ -1,4 +1,4 @@
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using MVC_Stanovi.Models;
 using MySql.Data.MySqlClient;
@@ -18,7 +18,7 @@ namespace MVC_Stanovi.Controllers
             _logger = logger;
         }
 
-
+        // 🔍 INDEX (filteri)
         public IActionResult Index(string tip, string kvad, string cena, string vrsta)
         {
             List<Stan> stanovi = new List<Stan>();
@@ -33,9 +33,7 @@ namespace MVC_Stanovi.Controllers
                     query += " AND ulica = @tip";
 
                 if (!string.IsNullOrEmpty(kvad))
-                
                     query += " AND kvadratura = @kvad";
-                
 
                 if (!string.IsNullOrEmpty(vrsta))
                     query += " AND vrsta = @vrsta";
@@ -58,9 +56,7 @@ namespace MVC_Stanovi.Controllers
                     cmd.Parameters.AddWithValue("@tip", tip);
 
                 if (!string.IsNullOrEmpty(kvad))
-                
                     cmd.Parameters.AddWithValue("@kvad", Convert.ToInt32(kvad));
-                
 
                 if (!string.IsNullOrEmpty(vrsta))
                     cmd.Parameters.AddWithValue("@vrsta", vrsta);
@@ -76,7 +72,8 @@ namespace MVC_Stanovi.Controllers
                         ulica = reader["ulica"].ToString(),
                         kvadratura = Convert.ToInt32(reader["kvadratura"]),
                         cena = Convert.ToInt32(reader["cena"]),
-                        vrsta = reader["vrsta"].ToString()
+                        vrsta = reader["vrsta"].ToString(),
+                        slika = reader["slika"].ToString() // 👈 dodato
                     });
                 }
             }
@@ -84,17 +81,112 @@ namespace MVC_Stanovi.Controllers
             return View(stanovi);
         }
 
-        public IActionResult Login()
+        // 🔐 LOGIN / REGISTER
+        public IActionResult Login() => View();
+        public IActionResult Register() => View();
+        public IActionResult Kontakt() => View();
+        public IActionResult Lokacije() => View();
+
+        // ➕ STRANICA ZA DODAVANJE
+        public IActionResult Dodavanje()
         {
             return View();
         }
 
-        public IActionResult Register()
+        // ➕ DODAJ STAN U BAZU
+        [HttpPost]
+        public IActionResult DodajStan(string naziv, string ulica, int kvadratura, int cena, string vrsta, string slika)
         {
-            return View();
+            using (MySqlConnection conn = new MySqlConnection(konekcija))
+            {
+                conn.Open();
+
+                string query = "INSERT INTO stanovi (naziv, ulica, kvadratura, cena, vrsta, slika) " +
+                               "VALUES (@naziv, @ulica, @kvad, @cena, @vrsta, @slika)";
+
+                MySqlCommand cmd = new MySqlCommand(query, conn);
+
+                cmd.Parameters.AddWithValue("@naziv", naziv);
+                cmd.Parameters.AddWithValue("@ulica", ulica);
+                cmd.Parameters.AddWithValue("@kvad", kvadratura);
+                cmd.Parameters.AddWithValue("@cena", cena);
+                cmd.Parameters.AddWithValue("@vrsta", vrsta);
+                cmd.Parameters.AddWithValue("@slika", slika);
+
+                cmd.ExecuteNonQuery();
+            }
+
+            return RedirectToAction("Admin"); 
         }
 
-     
+        public IActionResult User()
+        {
+            if (HttpContext.Session.GetString("user") == null)
+                return RedirectToAction("Login");
+
+            List<Stan> stanovi = new List<Stan>();
+
+            using (MySqlConnection conn = new MySqlConnection(konekcija))
+            {
+                conn.Open();
+
+                string query = "SELECT * FROM stanovi";
+                MySqlCommand cmd = new MySqlCommand(query, conn);
+
+                var reader = cmd.ExecuteReader();
+
+                while (reader.Read())
+                {
+                    stanovi.Add(new Stan
+                    {
+                        id = Convert.ToInt32(reader["id"]),
+                        naziv = reader["naziv"].ToString(),
+                        ulica = reader["ulica"].ToString(),
+                        kvadratura = Convert.ToInt32(reader["kvadratura"]),
+                        cena = Convert.ToInt32(reader["cena"]),
+                        vrsta = reader["vrsta"].ToString(),
+                        slika = reader["slika"].ToString() 
+                    });
+                }
+            }
+
+            return View(stanovi);
+        }
+
+        public IActionResult Admin()
+        {
+            if (HttpContext.Session.GetString("role") != "admin")
+                return RedirectToAction("Login");
+
+            List<Stan> stanovi = new List<Stan>();
+
+            using (MySqlConnection conn = new MySqlConnection(konekcija))
+            {
+                conn.Open();
+
+                string query = "SELECT * FROM stanovi";
+                MySqlCommand cmd = new MySqlCommand(query, conn);
+
+                var reader = cmd.ExecuteReader();
+
+                while (reader.Read())
+                {
+                    stanovi.Add(new Stan
+                    {
+                        id = Convert.ToInt32(reader["id"]),
+                        naziv = reader["naziv"].ToString(),
+                        ulica = reader["ulica"].ToString(),
+                        kvadratura = Convert.ToInt32(reader["kvadratura"]),
+                        cena = Convert.ToInt32(reader["cena"]),
+                        vrsta = reader["vrsta"].ToString(),
+                        slika = reader["slika"].ToString()
+                    });
+                }
+            }
+
+            return View(stanovi);
+        }
+
         [HttpPost]
         public IActionResult Register(string username, string password)
         {
@@ -113,7 +205,6 @@ namespace MVC_Stanovi.Controllers
             return RedirectToAction("Login");
         }
 
-      
         [HttpPost]
         public IActionResult Login(string username, string password)
         {
@@ -142,62 +233,16 @@ namespace MVC_Stanovi.Controllers
                 }
             }
 
-            ViewBag.Error = "Pogre�an login!";
+            ViewBag.Error = "Pogrešan login!";
             return View();
         }
 
-        public IActionResult User()
-        {
-            if (HttpContext.Session.GetString("user") == null)
-                return RedirectToAction("Login");
-
-            List<Stan> stanovi = new List<Stan>();
-
-            using (MySqlConnection conn = new MySqlConnection(konekcija))
-            {
-                conn.Open();
-
-                string query = "SELECT * FROM stanovi";
-                MySqlCommand cmd = new MySqlCommand(query, conn);
-
-                var reader = cmd.ExecuteReader();
-
-                while (reader.Read())
-                {
-                    stanovi.Add(new Stan
-                    {
-                        id = Convert.ToInt32(reader["id"]),
-                        naziv = reader["naziv"].ToString(),
-                        ulica = reader["ulica"].ToString(),
-                        kvadratura = Convert.ToInt32(reader["kvadratura"]),
-                        cena = Convert.ToInt32(reader["cena"]),
-                        vrsta = reader["vrsta"].ToString()
-                    });
-                }
-
-                Console.WriteLine("BROJ STANOVA: " + stanovi.Count);
-            }
-
-            return View(stanovi);
-        }
-
-
-        public IActionResult Admin()
-        {
-            if (HttpContext.Session.GetString("role") != "admin")
-                return RedirectToAction("Login");
-
-            return View();
-        }
-
-        
         public IActionResult Logout()
         {
             HttpContext.Session.Clear();
             return RedirectToAction("Index");
         }
 
-        
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {

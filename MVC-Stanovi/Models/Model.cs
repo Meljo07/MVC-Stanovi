@@ -8,6 +8,11 @@
             public int kvadratura { get; set; }
             public int cena { get; set; }
             public string vrsta { get; set; }
-        }
-    
+   +
+        public int Id { get; set; }
+        public string slika { get; set; }
+        public string Opis { get; set; }
+    }
+
+
 }

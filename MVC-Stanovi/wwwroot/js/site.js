@@ -1,4 +1,14 @@
-﻿// Please see documentation at https://learn.microsoft.com/aspnet/core/client-side/bundling-and-minification
-// for details on configuring this project to bundle and minify static web assets.
+﻿function dodajStan() {
+    let url = document.getElementById("slikaInput").value;
 
-// Write your JavaScript code.
+    let maliDiv = document.createElement("div");
+    maliDiv.className = "stan";
+
+    let img = document.createElement("img");
+    img.src = url;
+    img.style.width = "100px";
+
+    maliDiv.appendChild(img);
+
+    document.getElementById("velikiDiv").appendChild(maliDiv);
+}

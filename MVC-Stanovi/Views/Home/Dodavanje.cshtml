@@ -1,9 +1,13 @@
 ﻿<div class="dodavanje">
-	<form asp-action="DodajStan" method="post">
-		<input type="text" name="Slika" placeholder="URL slike" />
-		<input type="text" name="Opis" placeholder="Opis stana" />
-		<button type="submit">Dodaj</button>
-	</form>
+	
+		<input type="text" id="slikaInput" placeholder="URL slike" />
+		<input type="text" id="lokacijaInput" placeholder="Lokacija" />
+		<input type="text" id="povrsinaInput" placeholder="Površina" />
+		<input type="text" id="cenaInput" placeholder="Cena" />
+		<input type="text" id="adresaInput" placeholder="Adresa" />
+
+		<button type="button" onclick="dodajStan()">Dodaj</button>
+	
 
 <div id="velikiDiv">
 </div>

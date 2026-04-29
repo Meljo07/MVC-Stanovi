@@ -163,6 +163,9 @@ select {
     flex-wrap: wrap;
     gap: 10px;
 }
+#dodaj{
+    margin-top:15px;
+}
 
 .stan {
     border: 1px solid black;

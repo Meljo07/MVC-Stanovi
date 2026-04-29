@@ -18,7 +18,6 @@ namespace MVC_Stanovi.Controllers
             _logger = logger;
         }
 
-        // 🔍 INDEX (filteri)
         public IActionResult Index(string tip, string kvad, string cena, string vrsta)
         {
             List<Stan> stanovi = new List<Stan>();
@@ -73,7 +72,7 @@ namespace MVC_Stanovi.Controllers
                         kvadratura = Convert.ToInt32(reader["kvadratura"]),
                         cena = Convert.ToInt32(reader["cena"]),
                         vrsta = reader["vrsta"].ToString(),
-                        slika = reader["slika"].ToString() // 👈 dodato
+                        slika = reader["slika"].ToString() 
                     });
                 }
             }
@@ -81,19 +80,16 @@ namespace MVC_Stanovi.Controllers
             return View(stanovi);
         }
 
-        // 🔐 LOGIN / REGISTER
         public IActionResult Login() => View();
         public IActionResult Register() => View();
         public IActionResult Kontakt() => View();
         public IActionResult Lokacije() => View();
 
-        // ➕ STRANICA ZA DODAVANJE
         public IActionResult Dodavanje()
         {
             return View();
         }
 
-        // ➕ DODAJ STAN U BAZU
         [HttpPost]
         public IActionResult DodajStan(string naziv, string ulica, int kvadratura, int cena, string vrsta, string slika)
         {
